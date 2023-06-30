@@ -4,6 +4,7 @@ import { z } from "zod"
 import { match } from "ts-pattern"
 import satori from "satori"
 import sharp from "sharp"
+import { env, formats } from "../env"
 
 export async function get(context: APIContext): Promise<Response> {
 	const parametersResult = parseParameters(context)
@@ -30,7 +31,7 @@ export async function get(context: APIContext): Promise<Response> {
 		{
 			status: 200,
 			headers: {
-				"Content-Type": match(parameters.options.format)
+				"Content-Type": match(parameters.format)
 					.with("svg", () => "image/svg+xml")
 					.with("png", () => "image/png")
 					.with("webp", () => "image/jpeg")
@@ -41,59 +42,58 @@ export async function get(context: APIContext): Promise<Response> {
 	)
 }
 
-const MAX_WIDTH = 3200
-const MAX_HEIGHT = 3200
-
-const FORMAT_DEFAULT = "svg"
-const FORMAT_LIST = ["svg", "png", "webp", "jpeg"] as const
-
-const DPR_DEFAULT = 1
-const DPR_MAX = 3
-
-const sizeSchema = z.string()
-	.regex(/^(\d+)(?:x?(\d+))?$/)
-	.transform(value => {
-		const [width, height] = value.split("x")
-		return { width, height: height ?? width }
-	})
-	.pipe(z.object({
-		width: z.coerce.number().positive().step(1).max(MAX_WIDTH),
-		height: z.coerce.number().positive().step(1).max(MAX_HEIGHT),
-	}))
-
-const optionsSchema = z.object({
-	format: z.enum(FORMAT_LIST).default(FORMAT_DEFAULT),
-	dpr: z.coerce.number().positive().step(1).max(DPR_MAX).default(DPR_DEFAULT),
+const commonSchema = z.object({
+	width: z.coerce.number().positive().step(1).max(env.WIDTH_MAX),
+	height: z.coerce.number().positive().step(1).max(env.HEIGHT_MAX),
+	dpr: z.coerce.number().positive().step(1).max(env.DPR_MAX).default(env.DPR_DEFAULT),
+	format: z.enum(formats).default(env.FORMAT_DEFAULT),
 })
 
-type Size = z.infer<typeof sizeSchema>
-type Options = z.infer<typeof optionsSchema>
+const LITERAL_RE = /^(?<width>\d+)(?:x?(?<height>\d+))?(?:@(?<dpr>\d+))?(?:\.(?<format>\w+))?$/
+
+const literalSchema = z.string()
+	.regex(LITERAL_RE)
+	.transform((value) => {
+		const matches = LITERAL_RE.exec(value)
+
+		if (!matches || !matches.groups) {
+			return {}
+		}
+
+		const {width, height, dpr, format} = matches.groups
+		return { width, height: height ?? width, dpr, format }
+	})
+	.pipe(commonSchema)
+
+const querySchema = commonSchema.partial()
+
+type Parameters = z.infer<typeof literalSchema> & z.infer<typeof querySchema>
 
 function parseParameters(context: APIContext) {
-	const sizeResult = sizeSchema.safeParse(context.params.size)
+	const literalResult = literalSchema.safeParse(context.params.size)
 
-	if (sizeResult.success === false) {
-		return sizeResult
+	if (literalResult.success === false) {
+		return literalResult
 	}
 
-	const optionsResult = optionsSchema.safeParse(
-		Object.fromEntries(new URL(context.request.url).searchParams.entries())
-	)
+	// const queryResult = querySchema.safeParse(
+	// 	Object.fromEntries(new URL(context.request.url).searchParams.entries())
+	// )
 
-	if (optionsResult.success === false) {
-		return optionsResult
-	}
+	// if (queryResult.success === false) {
+	// 	return queryResult
+	// }
 
 	return {
 		success: true,
 		data: {
-			size: sizeResult.data,
-			options: optionsResult.data,
+			// ...queryResult.data,
+			...literalResult.data,
 		}
 	}
 }
 
-async function generateImage({ size, options }: { size: Size, options: Options }) {
+async function generateImage(parameters: Parameters) {
 	const svg = await satori(
 		{
 			type: "div",
@@ -113,7 +113,7 @@ async function generateImage({ size, options }: { size: Size, options: Options }
 					{
 						type: "div",
 						props: {
-							children: `${size.width}x${size.height}`
+							children: `${parameters.width}x${parameters.height}`
 						}
 					},
 					{
@@ -122,16 +122,14 @@ async function generateImage({ size, options }: { size: Size, options: Options }
 							style: {
 								fontSize: 16
 							},
-							children: Object.entries(options)
-								.map(([name, value]) => `[${name}=${String(value)}]`)
-								.join("")
+							children: `@${parameters.dpr} .${parameters.format}`
 						}
 					},
 				],
 			},
 		}, {
-			width: size.width * options.dpr,
-			height: size.height * options.dpr,
+			width: parameters.width * parameters.dpr,
+			height: parameters.height * parameters.dpr,
 			fonts: [
 				{
 					name: "Inter",
@@ -141,11 +139,11 @@ async function generateImage({ size, options }: { size: Size, options: Options }
 		}
 	)
 
-	if (options.format === "svg") {
+	if (parameters.format === "svg") {
 		return svg
 	} else {
 		return sharp(Buffer.from(svg))
-			.toFormat(options.format)
+			.toFormat(parameters.format)
 			.toBuffer()
 	}
 }
