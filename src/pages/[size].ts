@@ -50,19 +50,16 @@ const FORMAT_LIST = ["svg", "png", "webp", "jpeg"] as const
 const DPR_DEFAULT = 1
 const DPR_MAX = 3
 
-const sizeSchema = z.preprocess(value => {
-	// supports for named groups seems to not be in typescript
-	const matched = /^(?<width>\d+)(?:x)?(?<height>\d+)?$/.exec(String(value))
-
-	if (matched) {
-		return { width: matched[1], height: matched[2] ?? matched[1] }
-	} else {
-
-	}
-}, z.object({
-	width: z.coerce.number().positive().step(1).max(MAX_WIDTH),
-	height: z.coerce.number().positive().step(1).max(MAX_HEIGHT),
-}))
+const sizeSchema = z.string()
+	.regex(/^(\d+)(?:x?(\d+))?$/)
+	.transform(value => {
+		const [width, height] = value.split("x")
+		return { width, height: height ?? width }
+	})
+	.pipe(z.object({
+		width: z.coerce.number().positive().step(1).max(MAX_WIDTH),
+		height: z.coerce.number().positive().step(1).max(MAX_HEIGHT),
+	}))
 
 const optionsSchema = z.object({
 	format: z.enum(FORMAT_LIST).default(FORMAT_DEFAULT),
