@@ -1,7 +1,9 @@
 import type { APIContext } from "astro"
 import fs from "fs/promises"
 import { z } from "zod"
+import { match } from "ts-pattern"
 import satori from "satori"
+import sharp from "sharp"
 
 export async function get(context: APIContext): Promise<Response> {
 	const parametersResult = parseParameters(context)
@@ -21,12 +23,19 @@ export async function get(context: APIContext): Promise<Response> {
 		)
 	}
 
+	const parameters = parametersResult.data
+
 	return new Response(
-		await generateImage(parametersResult.data),
+		await generateImage(parameters),
 		{
 			status: 200,
 			headers: {
-				"Content-Type": "image/svg+xml",
+				"Content-Type": match(parameters.options.format)
+					.with("svg", () => "image/svg+xml")
+					.with("png", () => "image/png")
+					.with("webp", () => "image/jpeg")
+					.with("jpeg", () => "image/jpeg")
+					.exhaustive()
 			}
 		}
 	)
@@ -36,18 +45,20 @@ const MAX_WIDTH = 3200
 const MAX_HEIGHT = 3200
 
 const FORMAT_DEFAULT = "svg"
-const FORMAT_LIST = ["svg"] as const
+const FORMAT_LIST = ["svg", "png", "webp", "jpeg"] as const
 
 const DPR_DEFAULT = 1
 const DPR_MAX = 3
 
 const sizeSchema = z.preprocess(value => {
-	const [, width, height] = String(value).match(/^(\d+)(?:x(\d+))?$/)
+	// supports for named groups seems to not be in typescript
+	const matched = /^(?<width>\d+)(?:x)?(?<height>\d+)?$/.exec(String(value))
 
-	return ({
-		width,
-		height: height ?? width
-	})
+	if (matched) {
+		return { width: matched[1], height: matched[2] ?? matched[1] }
+	} else {
+
+	}
 }, z.object({
 	width: z.coerce.number().positive().step(1).max(MAX_WIDTH),
 	height: z.coerce.number().positive().step(1).max(MAX_HEIGHT),
@@ -86,7 +97,7 @@ function parseParameters(context: APIContext) {
 }
 
 async function generateImage({ size, options }: { size: Size, options: Options }) {
-	return satori(
+	const svg = await satori(
 		{
 			type: "div",
 			props: {
@@ -132,4 +143,12 @@ async function generateImage({ size, options }: { size: Size, options: Options }
 			],
 		}
 	)
+
+	if (options.format === "svg") {
+		return svg
+	} else {
+		return sharp(Buffer.from(svg))
+			.toFormat(options.format)
+			.toBuffer()
+	}
 }
