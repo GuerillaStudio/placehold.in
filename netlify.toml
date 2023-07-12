@@ -3,4 +3,5 @@ publish = "dist"
 command = "npm run build"
 
 [functions]
+external_node_modules=["sharp"]
 included_files = ["node_modules/sharp/**/*"]
