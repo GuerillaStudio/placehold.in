@@ -1,3 +1,6 @@
 [build]
 publish = "dist"
 command = "npm run build"
+
+[functions]
+included_files = ["node_modules/sharp/**/*"]
