@@ -7,6 +7,10 @@ import { ENV, SUPPORTED_FORMATS } from "../env"
 import { Placeholder } from "../components/PlaceholderImage"
 import sharp from "sharp"
 
+export async function getStaticPaths() {
+	return []
+}
+
 export const get: APIRoute = async ({params, request}) => {
 	const literalResult = literalParametersSchema.safeParse(params.parameters)
 
