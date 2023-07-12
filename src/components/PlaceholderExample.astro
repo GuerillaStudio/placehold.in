@@ -1,0 +1,39 @@
+---
+interface Props {
+	width: number,
+	height?: number,
+	dpr?: number,
+	format?: string,
+	dark?: true,
+	lazy?: true
+}
+
+const { width, height, dpr, format, dark, lazy } = Astro.props
+const { origin } = Astro.url
+
+const path = [
+	`${origin}/`,
+	height ? `${width}x${height}` : width,
+	dpr && `@${dpr}x`,
+	format && `.${format}`,
+	dark && "?dark",
+].filter(x => x != null).join("")
+
+const description = [
+	"A",
+	dark && "dark",
+	height ? "rectangle" : "square",
+	format,
+	"placeholder image",
+	dpr && `scaled ${dpr} times`,
+	".",
+].filter(x => x != null).join(" ")
+---
+<div class="not-prose">
+	<figure>
+		<img src={path} width={width} height={height ?? width} alt={description} loading={ lazy ? 'lazy' : 'eager' } class="mx-auto text-base"  />
+		<figcaption class="mt-2">
+			<code class="break-all text-xs">{path}</code>
+		</figcaption>
+	</figure>
+</div>

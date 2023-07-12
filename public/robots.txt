@@ -1,0 +1,8 @@
+User-Agent: *
+Disallow: /*.svg
+Disallow: /*.jpg
+Disallow: /*.jpeg
+Disallow: /*.png
+Disallow: /*.webp
+Disallow: /*.avif
+Disallow: /*.heif

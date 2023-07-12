@@ -1,18 +1,27 @@
 import { z } from "zod"
 
-export const formats = ["svg", "png", "jpeg", "webp"] as const
+export const SUPPORTED_FORMATS = [
+	"avif",
+	"heif",
+	"jpeg",
+	"jxl",
+	"png",
+	"svg",
+	"webp",
+] as const
 
-const positiveIntSchema = z.coerce.number().positive().step(1)
+const positiveInt = z.coerce.number().int().positive()
 
 const envSchema = z.object({
-	WIDTH_MAX: positiveIntSchema,
-	HEIGHT_MAX: positiveIntSchema,
-	FORMAT_DEFAULT: z.enum(formats),
-	FORMAT_LIST: z.string()
-		.transform(value => value.split(","))
-		.pipe(z.array(z.enum(formats)).nonempty()),
-	DPR_DEFAULT: positiveIntSchema,
-	DPR_MAX: positiveIntSchema,
+	DIMENSION_MAX: positiveInt,
+	DPR_MAX: positiveInt,
+	FORMAT_DEFAULT: z.enum(SUPPORTED_FORMATS),
 })
 
-export const env = envSchema.parse(import.meta.env)
+type Env = z.infer<typeof envSchema>
+
+export const ENV: Env = {
+	DIMENSION_MAX: 1600,
+	DPR_MAX: 5,
+	FORMAT_DEFAULT: "svg",
+}
