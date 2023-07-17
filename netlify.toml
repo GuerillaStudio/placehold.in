@@ -1,6 +1,9 @@
 [build]
-publish = "dist"
-command = "pnpm run build"
+	command = "pnpm run build"
+	publish = "dist"
+
+# [functions]
+# 	external_node_modules = ["astro"]
 
 # [functions]
 # external_node_modules=["sharp"]
