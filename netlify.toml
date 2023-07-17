@@ -2,6 +2,6 @@
 publish = "dist"
 command = "pnpm run build"
 
-[functions]
-external_node_modules=["sharp"]
-included_files = ["node_modules/sharp/**/*"]
+# [functions]
+# external_node_modules=["sharp"]
+# included_files = ["node_modules/sharp/**/*"]

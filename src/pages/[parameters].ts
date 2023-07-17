@@ -6,6 +6,9 @@ import { z } from "zod"
 import { ENV, SUPPORTED_FORMATS } from "../env"
 import { Placeholder } from "../components/PlaceholderImage"
 import sharp from "sharp"
+import { createElement } from "react"
+
+// import inter from "@fontsource/inter/files/inter-latin-500-normal.woff"
 
 // export async function getStaticPaths() {
 // 	return []
@@ -25,39 +28,26 @@ export const get: APIRoute = async ({params, request}) => {
 		const parameters = literalResult.data
 		const dark = new URL(request.url).searchParams.has("dark")
 
-		const svg = await satori({
-			type: Placeholder,
-			props: {
+		const svg = await satori(
+			createElement(Placeholder, {
 				...parameters,
 				dark
-			}
-		}, {
+			}), {
 			width: parameters.width * parameters.dpr,
 			height: parameters.height * parameters.dpr,
 			fonts: [
 				{
 					name: "Inter",
-					data: await fetch(new URL("/fonts/Inter/static/Inter-Regular.ttf", request.url))
-						.then(x => x.arrayBuffer()),
+					// data: Buffer.from(inter),
+					// data: await fetch(new URL(inter, request.url)).then(x => x.arrayBuffer()),
+					data: await fetch("https://unpkg.com/@fontsource/inter/files/inter-latin-500-normal.woff").then(x => x.arrayBuffer()),
 				},
 			],
 		})
 
 		const image = await match(parameters.format)
 			.with("svg", () => svg)
-			.otherwise(async format => {
-				return sharp(Buffer.from(svg)).toFormat(format).toBuffer()
-
-				// const vips = await Vips({
-				// 	dynamicLibraries: [
-				// 		"vips-heif.wasm",
-				// 		"vips-jxl.wasm",
-				// 		"vips-resvg.wasm",
-				// 	]
-				// })
-
-				// return vips.Image.newFromBuffer(svg).writeToBuffer("." + format)
-			})
+			.otherwise(async format => sharp(Buffer.from(svg)).toFormat(format).toBuffer())
 
 		const mediaType = match(parameters.format)
 			.with("avif", () => "image/avif")
