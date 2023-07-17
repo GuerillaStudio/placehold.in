@@ -10,9 +10,9 @@ export default defineConfig({
   output: "server",
   adapter: netlify(),
   integrations: [tailwind(), react()],
-  build: {
-    split: true
-  },
+  // build: {
+  //   split: true
+  // },
   // vite: {
   //   plugins: [
   //     rawFonts([".woff"])
