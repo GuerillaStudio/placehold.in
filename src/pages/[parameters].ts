@@ -14,6 +14,8 @@ import { createElement } from "react"
 // 	return []
 // }
 
+export const prerender = false
+
 export const get: APIRoute = async ({params, request}) => {
 	const literalResult = literalParametersSchema.safeParse(params.parameters)
 
