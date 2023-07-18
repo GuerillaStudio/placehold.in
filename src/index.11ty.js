@@ -18,11 +18,7 @@ class Home {
         </p>
 
         <div class="border-2 border-gray-200 bg-gray-100 p-2">
-        <span>${data.global.origin}/</span>
-        <span class="bg-blue-100">300x200</span>
-        <span class="bg-yellow-100">@2x</span>
-        <span class="bg-green-100">.png</span>
-        <span class="bg-red-100">?dark</span>
+        <span>${data.global.origin}/</span><span class="bg-blue-100">300x200</span><span class="bg-yellow-100">@2x</span><span class="bg-green-100">.png</span><span class="bg-red-100">?dark</span>
         </div>
 
         <menu>
