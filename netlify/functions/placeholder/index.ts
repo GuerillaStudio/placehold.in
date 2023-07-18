@@ -26,7 +26,8 @@ const handler: Handler = async (event: HandlerEvent) => {
             body: JSON.stringify({
                 description: "Invalid parameters",
                 issues: literalResult.error.issues,
-            })
+            }),
+            ttl: 31536000
 		}
 	} else {
 		const parameters = literalResult.data
@@ -68,8 +69,9 @@ const handler: Handler = async (event: HandlerEvent) => {
 			isBase64Encoded: parameters.format !== 'svg',
 			statusCode: 200,
 			headers: {
-				"Content-Type": mediaType,
-			}
+                "Content-Type": mediaType,
+			},
+            ttl: 31536000
 		}
 	}
 }
