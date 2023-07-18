@@ -1,109 +1,41 @@
-import { builder, type Handler } from "@netlify/functions";
-import { match } from "ts-pattern"
-import satori from "satori"
-import { z } from "zod"
-import { Placeholder } from "./components/PlaceholderImage"
-import sharp from "sharp"
-import { createElement } from "react"
-import fetch from "node-fetch"
+import type { Handler, HandlerEvent, HandlerContext } from "@netlify/functions"
+import { builder } from "@netlify/functions"
+import { handle } from "../placeholder"
 
-const ENV = process.env
-const SUPPORTED_FORMATS = JSON.parse(process.env.SUPPORTED_FORMATS)
+const ttl = 60 * 60 * 24 * 364
 
-const handler: Handler = async (event: HandlerEvent) => {
+const main: Handler = async (event: HandlerEvent, context: HandlerContext) => {
+	console.log(event.path)
 
-    const request = event
-    const params = event.path.substring(1)
-	const literalResult = literalParametersSchema.safeParse(params)
+	const result = await handle(event.path.substring(1))
 
-
-	if (!literalResult.success) {
+	if (!result.success) {
 		return {
-            statusCode: 422,
-            headers: {
+			statusCode: 422,
+			headers: {
 				"Content-Type": "application/json",
 			},
-            body: JSON.stringify({
-                description: "Invalid parameters",
-                issues: literalResult.error.issues,
-            }),
-            ttl: 31536000
+			body: JSON.stringify({
+				description: "Invalid parameters",
+				issues: result.error.issues,
+			}),
+			ttl,
 		}
 	} else {
-		const parameters = literalResult.data
-		const dark = new URL(request.rawUrl).searchParams.has("dark")
-
-		const svg = await satori(
-			Placeholder({
-                ...parameters,
-                dark
-            }), {
-			width: parameters.width * parameters.dpr,
-			height: parameters.height * parameters.dpr,
-			fonts: [
-				{
-					name: "Inter",
-					// data: Buffer.from(inter),
-					// data: await fetch(new URL(inter, request.url)).then(x => x.arrayBuffer()),
-					data: await fetch("https://unpkg.com/@fontsource/inter/files/inter-latin-500-normal.woff").then(x => x.arrayBuffer()),
-				},
-			],
-		})
-
-		const image = await match(parameters.format)
-			.with("svg", () => svg)
-			.otherwise(async format => sharp(Buffer.from(svg)).toFormat(format).toBuffer())
-
-		const mediaType = match(parameters.format)
-			.with("avif", () => "image/avif")
-			.with("heif", () => "image/heif")
-			.with("jpeg", () => "image/jpeg")
-			.with("jxl", () => "image/jxl")
-			.with("png", () => "image/png")
-			.with("svg", () => "image/svg+xml")
-			.with("webp", () => "image/jpeg")
-			.exhaustive()
+		const { image, binary, mediaType } = result.data
 
 		return  {
-            body: parameters.format === 'svg' ? image : image.toString("base64"),
-			isBase64Encoded: parameters.format !== 'svg',
 			statusCode: 200,
 			headers: {
-                "Content-Type": mediaType,
+				"Content-Type": mediaType,
 			},
-            ttl: 31536000
+			body: binary ? image.toString("base64") : image,
+			isBase64Encoded: binary,
+			ttl,
 		}
 	}
 }
 
-const positiveInt = z.coerce.number().int().positive()
+const handler = builder(main)
+export { handler }
 
-export const parametersSchema = z.object({
-	width: positiveInt.max(ENV.DIMENSION_MAX),
-	height: positiveInt.max(ENV.DIMENSION_MAX),
-	dpr: positiveInt.max(ENV.DPR_MAX).default(1),
-	format: z.enum(SUPPORTED_FORMATS).default(ENV.FORMAT_DEFAULT),
-})
-
-export type Parameters = z.infer<typeof parametersSchema>
-
-const literalParametersRegex =
-	/^(?<width>\d+)(?:x?(?<height>\d+))?(?:@(?<dpr>\d+)x)?(?:\.(?<format>\w+))?$/
-
-export const literalParametersSchema = z
-	.string()
-	.regex(literalParametersRegex)
-	.transform((value) => {
-		const matches = value.match(literalParametersRegex)
-
-		if (!matches || !matches.groups) {
-			return {}
-		}
-
-		const { width, height, dpr, format } = matches.groups
-		return { width, height: height ?? width, dpr, format }
-	})
-	.pipe(parametersSchema)
-
-
-export { handler };

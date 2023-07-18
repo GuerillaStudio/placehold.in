@@ -9,7 +9,7 @@ module.exports = function(eleventyConfig) {
             height ? `${width}x${height}` : width,
             dpr && `@${dpr}x`,
             format && `.${format}`,
-            dark && "?dark",
+            dark && "/dark",
         ].filter(x => x != null).join("")
 
         const description = [

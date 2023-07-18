@@ -1,4 +1,24 @@
+# [build]
+# 	command = "pnpm build"
+# 	publish = "_site"
+
 [[redirects]]
-from = "/*"
-to = "/.netlify/functions/placeholder"
-status = 200
+	from = "/*"
+	to = "/.netlify/builders/placeholder"
+	status = 200
+
+# # tried to the query param redirect
+# # /generated/image url=:url w=:w /img/:url/:w 301!
+# # /img/:url/:w /.netlify/builders/image 200
+
+# [[redirects]]
+# 	from = "/*"
+# 	to = "/.netlify/functions/placeholder/:splat/:dark"
+# 	query = {dark = ":dark"}
+# 	status = 301
+# 	force = true
+
+# [[redirects]]
+# 	from = "/i/:splat/:dark"
+# 	to = "/.netlify/functions/placeholder"
+# 	status = 200
