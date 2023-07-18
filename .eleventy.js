@@ -8,8 +8,6 @@ module.exports = function(eleventyConfig) {
     eleventyConfig.addGlobalData("FORMAT_DEFAULT", process.env.FORMAT_DEFAULT)
 
     eleventyConfig.addNunjucksShortcode("placeholder", function({ width, height, dpr, format, dark, lazy }) {
-        console.log(this.eleventy)
-
         const path = [
             `${this.ctx.BASE_URL}/`,
             height ? `${width}x${height}` : width,

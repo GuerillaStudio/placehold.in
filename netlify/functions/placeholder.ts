@@ -1,9 +1,8 @@
-import { match } from "ts-pattern"
 import { z } from "zod"
+import { match } from "ts-pattern"
 import satori from "satori"
 import { html } from "satori-html"
 import sharp from "sharp"
-import type { ReactNode } from "react"
 
 const SUPPORTED_FORMATS = ["avif", "heif", "jpeg", "jxl", "png", "svg", "webp"] as const
 type Format = typeof SUPPORTED_FORMATS[number]
@@ -87,7 +86,7 @@ function PlaceholderHtml(props: Parameters) {
 			<div>${`${props.width}x${props.height}`}</div>
 			<div>${`@${props.dpr}x .${props.format}`}</div>
 		</div>
-	` as ReactNode // see https://github.com/natemoo-re/satori-html/issues/16
+	`
 }
 
 const positiveInt = z.coerce.number().int().positive()
