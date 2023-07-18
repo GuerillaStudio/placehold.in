@@ -1,0 +1,9 @@
+{
+	"$schema": "https://json.schemastore.org/web-manifest-combined.json",
+	"name": "Placehold.in",
+	"short_name": "Placehold.in",
+	"start_url": ".",
+	"display": "minimal-ui",
+	"background_color": "#D000C6",
+	"description": "A quick way to display placeholder images during mockups"
+}

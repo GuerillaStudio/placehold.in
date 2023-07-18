@@ -3,23 +3,38 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
-		<meta name="description" content="A quick way to display placeholder images during mockups" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
+
 		<title>Placehold.in - A Simple Image Placeholder</title>
+		<meta name="description" content="A quick way to display placeholder images during mockups" />
+
+        <link rel="preload" href="/style.css" as="style" />
+        <link rel="preload" href="/picto.svg" as="image" type="image/svg+xml" />
+
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="stylesheet" href="/style.css">
+
+		<meta name="generator" content="Eleventy" />
+
+        <meta property="og:url" content="https://placehold.in">
+        <meta property="og:title" content="Placehold.in - A Simple Image Placeholder">
+        <meta property="og:description" content="A quick way to display placeholder images during mockups">
+        <meta property="og:image" content="https://placehold.in/favicon-big.png">
+        <meta property="og:image:width" content="512">
+        <meta property="og:image:height" content="512">
+
 	</head>
 	<body class="border-t-8 border-primary scroll-smooth">
 		<div class="max-w-xl mx-auto prose md:prose-xl px-4 py-8 prose-h1:mb-8">
 			<header class="pt-8">
 				<div class="flex items-baseline gap-x-2 md:gap-x-5">
-				<img class="m-0 md:m-0 h-6 w-6 md:h-11 md:w-11" src="picto.svg" alt="" aria-hidden="true" width="42" height="42"/>
+				<img class="m-0 md:m-0 h-6 w-6 md:h-11 md:w-11" src="picto.svg" alt="" aria-hidden="true" width="42" height="42" fetchpriority="high"/>
 				<a href="/" class="no-underline">
 					<h1>Placehold.in</h1>
 				</a>
 				</div>
 			</header>
 			<main>
-				<slot />
+				{{ content | safe }}
 			</main>
 			<footer class="pt-8 pb-6 md:py-16 text-slate-500 text-base text-center">
 				<div class="not-prose text-3xl text-center text-slate-200 mb-4 md:mb-8" aria-hidden="true">∴</div>

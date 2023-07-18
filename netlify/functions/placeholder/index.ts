@@ -1,40 +1,42 @@
-
-import type { APIRoute } from "astro"
+import { builder, type Handler } from "@netlify/functions";
 import { match } from "ts-pattern"
 import satori from "satori"
 import { z } from "zod"
-import { ENV, SUPPORTED_FORMATS } from "../env"
-import { Placeholder } from "../components/PlaceholderImage"
+import { Placeholder } from "./components/PlaceholderImage"
 import sharp from "sharp"
 import { createElement } from "react"
+import fetch from "node-fetch"
 
-// import inter from "@fontsource/inter/files/inter-latin-500-normal.woff"
+const ENV = process.env
+const SUPPORTED_FORMATS = JSON.parse(process.env.SUPPORTED_FORMATS)
 
-// export async function getStaticPaths() {
-// 	return []
-// }
+const handler: Handler = async (event: HandlerEvent) => {
 
-export const prerender = false
+    const request = event
+    const params = event.path.substring(1)
+	const literalResult = literalParametersSchema.safeParse(params)
 
-export const get: APIRoute = async ({params, request}) => {
-	const literalResult = literalParametersSchema.safeParse(params.parameters)
 
 	if (!literalResult.success) {
-		return new Response(JSON.stringify({
-			description: "Invalid parameters",
-			issues: literalResult.error.issues,
-		}), {
-			status: 422
-		})
+		return {
+            statusCode: 422,
+            headers: {
+				"Content-Type": "application/json",
+			},
+            body: JSON.stringify({
+                description: "Invalid parameters",
+                issues: literalResult.error.issues,
+            })
+		}
 	} else {
 		const parameters = literalResult.data
-		const dark = new URL(request.url).searchParams.has("dark")
+		const dark = new URL(request.rawUrl).searchParams.has("dark")
 
 		const svg = await satori(
-			createElement(Placeholder, {
-				...parameters,
-				dark
-			}), {
+			Placeholder({
+                ...parameters,
+                dark
+            }), {
 			width: parameters.width * parameters.dpr,
 			height: parameters.height * parameters.dpr,
 			fonts: [
@@ -61,12 +63,14 @@ export const get: APIRoute = async ({params, request}) => {
 			.with("webp", () => "image/jpeg")
 			.exhaustive()
 
-		return new Response(image, {
-			status: 200,
+		return  {
+            body: parameters.format === 'svg' ? image : image.toString("base64"),
+			isBase64Encoded: parameters.format !== 'svg',
+			statusCode: 200,
 			headers: {
 				"Content-Type": mediaType,
 			}
-		})
+		}
 	}
 }
 
@@ -98,3 +102,6 @@ export const literalParametersSchema = z
 		return { width, height: height ?? width, dpr, format }
 	})
 	.pipe(parametersSchema)
+
+
+export { handler };

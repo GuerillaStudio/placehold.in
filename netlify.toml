@@ -1,10 +1,4 @@
-[build]
-	command = "pnpm run build"
-	publish = "dist"
-
-# [functions]
-# 	external_node_modules = ["astro"]
-
-# [functions]
-# external_node_modules=["sharp"]
-# included_files = ["node_modules/sharp/**/*"]
+[[redirects]]
+from = "/*"
+to = "/.netlify/functions/placeholder"
+status = 200
