@@ -24,7 +24,7 @@ module.exports = function(eleventyConfig) {
         return `
             <div class="not-prose">
                 <figure>
-                    <img src="${path}" width="${width}" height="${height ?? width}" alt="${description}" loading="${ lazy ? 'lazy' : 'eager' }" class="mx-auto text-base"  />
+                    <img src="${path}" width="${width}" height="${height ?? width}" alt="${description}" loading="${ lazy ? 'lazy' : 'eager' }"  fetchpriority="${ lazy ? 'low' : 'high' }" class="mx-auto text-base"  />
                     <figcaption class="mt-2">
                         <code class="break-all text-xs">${path}</code>
                     </figcaption>
