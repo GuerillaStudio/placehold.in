@@ -1,11 +1,17 @@
+require('dotenv').config()
+
 module.exports = function(eleventyConfig) {
+    eleventyConfig.addGlobalData("BASE_URL", process.env.URL ?? "")
+    eleventyConfig.addGlobalData("SUPPORTED_FORMATS", ["avif", "heif", "jpeg", "jxl", "png", "svg", "webp"])
+    eleventyConfig.addGlobalData("DIMENSION_MAX", process.env.DIMENSION_MAX)
+    eleventyConfig.addGlobalData("DPR_MAX", process.env.DPR_MAX)
+    eleventyConfig.addGlobalData("FORMAT_DEFAULT", process.env.FORMAT_DEFAULT)
 
-    eleventyConfig.addShortcode("placeholderExample", function(props) {
-
-        const { origin, width, height, dpr, format, dark, lazy } = props
+    eleventyConfig.addNunjucksShortcode("placeholder", function({ width, height, dpr, format, dark, lazy }) {
+        console.log(this.eleventy)
 
         const path = [
-            `${origin}/`,
+            `${this.ctx.BASE_URL}/`,
             height ? `${width}x${height}` : width,
             dpr && `@${dpr}x`,
             format && `.${format}`,
