@@ -2,7 +2,7 @@ require('dotenv').config()
 
 module.exports = function(eleventyConfig) {
     eleventyConfig.addGlobalData("BASE_URL", process.env.URL ?? "")
-    eleventyConfig.addGlobalData("SUPPORTED_FORMATS", ["avif", "heif", "jpeg", "jxl", "png", "svg", "webp"])
+    eleventyConfig.addGlobalData("SUPPORTED_FORMATS", ["png", "jpeg", "svg", "webp", "avif", "heif"])
     eleventyConfig.addGlobalData("DIMENSION_MAX", process.env.DIMENSION_MAX)
     eleventyConfig.addGlobalData("DPR_MAX", process.env.DPR_MAX)
     eleventyConfig.addGlobalData("FORMAT_DEFAULT", process.env.FORMAT_DEFAULT)

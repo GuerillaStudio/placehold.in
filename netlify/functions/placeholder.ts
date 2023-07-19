@@ -5,7 +5,7 @@ import { html } from "satori-html"
 import { readFile } from "fs/promises"
 import sharp from "sharp"
 
-const SUPPORTED_FORMATS = ["avif", "heif", "jpeg", "jxl", "png", "svg", "webp"] as const
+const SUPPORTED_FORMATS = ["png", "jpeg", "svg", "webp", "avif", "heif"] as const
 type Format = typeof SUPPORTED_FORMATS[number]
 
 export async function handle(value: string) {
