@@ -2,6 +2,7 @@ import { z } from "zod"
 import { match } from "ts-pattern"
 import satori from "satori"
 import { html } from "satori-html"
+import { readFile } from "fs/promises"
 import sharp from "sharp"
 
 const SUPPORTED_FORMATS = ["avif", "heif", "jpeg", "jxl", "png", "svg", "webp"] as const
@@ -53,7 +54,7 @@ async function placeholderSvg(parameters: Parameters) {
 			fonts: [
 				{
 					name: "Inter",
-					data: await fetch("https://unpkg.com/@fontsource/inter/files/inter-latin-500-normal.woff").then(x => x.arrayBuffer()),
+					data: await readFile("node_modules/@fontsource/inter/files/inter-latin-500-normal.woff"),
 				},
 			],
 		}
