@@ -4,6 +4,9 @@
   "description": "A Simple Image Placeholder",
   "license": "Anti-Fascist MIT License",
   "private": true,
+  "scripts": {
+    "dev": "BROWSER=none netlify dev"
+  },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
     "@netlify/functions": "^1.6.0",
