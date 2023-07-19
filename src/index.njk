@@ -1,6 +1,8 @@
 ---
 layout: layout.njk
 ---
+{% from "macro.njk" import placeholder %}
+
 <p class="lead">
 	A quick way to display placeholder images during mockups and development using a simple and comprehensive syntax.
 </p>
@@ -37,7 +39,7 @@ layout: layout.njk
 	</ul>
 </menu>
 
-{% placeholder format="png", width=600, height=200, dark=true %}
+{{ placeholder({ width: 600, height: 200, format: "png", dark: true }) }}
 
 <section id="dimensions">
 	<h2>
@@ -50,19 +52,19 @@ layout: layout.njk
 
 	<div class="grid grid-cols-2 xs:grid-cols-4 gap-2 md:gap-5 items-center justify-items-center text-center">
 		<div class="col-span-2">
-			{% placeholder width=200 %}
+			{{ placeholder({ width: 600 }) }}
 		</div>
 
 		<div class="col-span-2">
-			{% placeholder width=300, height=200 %}
+			{{ placeholder({ width: 300, height: 200 }) }}
 		</div>
 
 		<div class="col-span-3">
-			{% placeholder width=400, height=300, lazy=true %}
+			{{ placeholder({ width: 400, height: 300 }, lazy=true) }}
 		</div>
 
 		<div>
-			{% placeholder width=100, height=200, lazy=true %}
+			{{ placeholder({ width: 100, height: 200 }, lazy=true) }}
 		</div>
 	</div>
 </section>
@@ -79,8 +81,8 @@ layout: layout.njk
 	</p>
 
 	<div class="grid grid-cols-1 xs:grid-cols-2 gap-2 md:gap-5 items-center justify-items-center text-center">
-		{% placeholder width=200, dpr=2, lazy=true %}
-		{% placeholder width=200, dpr=4, lazy=true %}
+		{{ placeholder({ width: 200, dpr: 2 }, lazy=true) }}
+		{{ placeholder({ width: 200, dpr: 4 }, lazy=true) }}
 	</div>
 </section>
 
@@ -90,16 +92,13 @@ layout: layout.njk
 	</h2>
 
 	<p>
-		Optional with <code>{{FORMAT_DEFAULT}}</code> as default. Allowed values are {{SUPPORTED_FORMATS | join(", ")}}.
+		Optional with <code>{{FORMAT_DEFAULT}}</code> as default. Allowed values are {% for format in SUPPORTED_FORMATS %}{{ (", " if loop.index !== loop.length else " and ") if not loop.first }}<code>{{format}}</code>{% endfor %}.
 	</p>
 
 	<div class="grid grid-cols-1 xs:grid-cols-2 gap-2 md:gap-5 items-center justify-items-center text-center">
-		{% placeholder width=200, format="png", lazy=true %}
-		{% placeholder width=200, format="jpeg", lazy=true %}
-		{% placeholder width=200, format="svg", lazy=true %}
-		{% placeholder width=200, format="webp", lazy=true %}
-		{% placeholder width=200, format="avif", lazy=true %}
-		{% placeholder width=200, format="heif", lazy=true %}
+		{% for format in SUPPORTED_FORMATS %}
+			{{ placeholder({ width: 200, format: format }, lazy=true) }}
+		{% endfor %}
 	</div>
 </section>
 
@@ -114,7 +113,7 @@ layout: layout.njk
 	</p>
 
 	<div class="grid grid-cols-1 xs:grid-cols-2 gap-2 md:gap-5 items-center justify-items-center text-center">
-		{% placeholder width=200, lazy=true %}
-		{% placeholder width=200, dark=true, lazy=true %}
+		{{ placeholder({ width: 200 }, lazy=true) }}
+		{{ placeholder({ width: 200, dark: true }, lazy=true) }}
 	</div>
 </section>

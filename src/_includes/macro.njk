@@ -1,0 +1,21 @@
+{% macro placeholder(parameters, lazy=false) %}
+    {% set url = parameters | placeholderUrl -%}
+
+    <div class="not-prose">
+        <figure>
+            <img
+                src="{{url}}"
+                width="{{parameters.width}}"
+                height="{{height if height else width}}"
+                alt="{{parameters | placeholderDescription}}"
+                loading="{{ 'lazy' if lazy else 'eager' }}"
+                fetchpriority="${ 'low' if lazy else 'high' }"
+                class="mx-auto text-base"
+            />
+
+            <figcaption class="mt-2">
+                <code class="break-all text-xs">{{url}}</code>
+            </figcaption>
+        </figure>
+    </div>
+{% endmacro %}
