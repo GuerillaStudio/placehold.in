@@ -5,8 +5,6 @@ import { handle } from "../placeholder"
 const ttl = 60 * 60 * 24 * 364
 
 const main: Handler = async (event: HandlerEvent, context: HandlerContext) => {
-	console.log(event.path)
-
 	const result = await handle(event.path.substring(1))
 
 	if (!result.success) {
