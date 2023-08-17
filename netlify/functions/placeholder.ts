@@ -32,7 +32,6 @@ export async function handle(value: string) {
 			.with("avif", () => "image/avif")
 			.with("heif", () => "image/heif")
 			.with("jpeg", () => "image/jpeg")
-			.with("jxl", () => "image/jxl")
 			.with("png", () => "image/png")
 			.with("svg", () => "image/svg+xml")
 			.with("webp", () => "image/jpeg")
