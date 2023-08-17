@@ -49,8 +49,8 @@ async function placeholderSvg(parameters: Parameters) {
 	return satori(
 		PlaceholderHtml(parameters),
 		{
-			width: parameters.width * parameters.dpr,
-			height: parameters.height * parameters.dpr,
+			width: Math.round(parameters.width * parameters.dpr),
+			height: Math.round(parameters.height * parameters.dpr),
 			fonts: [
 				{
 					name: "Inter",
@@ -90,12 +90,10 @@ function PlaceholderHtml(props: Parameters) {
 	`
 }
 
-const positiveInt = z.coerce.number().int().positive()
-
 export const parametersSchema = z.object({
-	width: positiveInt.max(Number(process.env.DIMENSION_MAX)),
-	height: positiveInt.max(Number(process.env.DIMENSION_MAX)),
-	dpr: positiveInt.max(Number(process.env.DPR_MAX)).default(1),
+	width: z.coerce.number().positive().int().max(Number(process.env.DIMENSION_MAX)),
+	height: z.coerce.number().positive().int().max(Number(process.env.DIMENSION_MAX)),
+	dpr: z.coerce.number().positive().multipleOf(0.1).max(Number(process.env.DPR_MAX)).default(1),
 	format: z.enum(SUPPORTED_FORMATS).default(process.env.FORMAT_DEFAULT as Format),
 	dark: z.boolean(),
 })
@@ -103,7 +101,7 @@ export const parametersSchema = z.object({
 export type Parameters = z.infer<typeof parametersSchema>
 
 const literalParametersRegex =
-	/^(?<width>\d+)(?:x?(?<height>\d+))?(?:@(?<dpr>\d+)x)?(?:\.(?<format>\w+))?(?:\/(?<dark>dark))?/
+	/^(?<width>\d+)(?:x?(?<height>\d+))?(?:@(?<dpr>\d+(?:\.\d+)?)x)?(?:\.(?<format>\w+))?(?:\/(?<dark>dark))?/
 
 export const literalParametersSchema = z
 	.string()
