@@ -3,7 +3,7 @@
 	publish = "_site"
 
 [functions]
-	external_node_modules = ["@fontsource/inter", "sharp"]
+	external_node_modules = ["@fontsource/inter"]
 
 [[redirects]]
 	from = "/*"

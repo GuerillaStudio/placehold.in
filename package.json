@@ -9,19 +9,19 @@
   },
   "devDependencies": {
     "@11ty/eleventy": "^2.0.1",
-    "@netlify/functions": "^1.6.0",
-    "@tailwindcss/typography": "^0.5.9",
-    "@types/node": "^20.4.2",
-    "dotenv": "^16.3.1",
-    "netlify-cli": "^15.9.1",
-    "tailwindcss": "^3.3.3"
+    "@netlify/functions": "^2.6.0",
+    "@tailwindcss/typography": "^0.5.10",
+    "@types/node": "^20.11.19",
+    "dotenv": "^16.4.4",
+    "netlify-cli": "^17.16.2",
+    "tailwindcss": "^3.4.1"
   },
   "dependencies": {
-    "@fontsource/inter": "^5.0.5",
-    "satori": "^0.10.1",
+    "@fontsource/inter": "^5.0.16",
+    "satori": "^0.10.13",
     "satori-html": "^0.3.2",
-    "sharp": "^0.32.6",
-    "ts-pattern": "^5.0.3",
-    "zod": "^3.21.4"
+    "sharp": "^0.33.2",
+    "ts-pattern": "^5.0.8",
+    "zod": "^3.22.4"
   }
 }
